@@ -2,6 +2,9 @@ import os
 import requests
 import subprocess
 from pycdlib import PyCdlib
+import requests as q
+
+print("*******", q.certs.where())
 
 download_directory = os.path.join(os.getcwd(), "downloads")
 if not os.path.exists(download_directory):
@@ -16,29 +19,30 @@ modified_iso_file = os.path.join(download_directory, "modified_windows.iso")
 
 def download_file(url, filename):
     proxies = {
-        "http": "http://proxy-dmz.intel.com:912",
-        "https": "https://proxy-dmz.intel.com:912",
+        "http": "",
+        "https": "",
     }
-    with requests.get(url, stream=True, proxies=proxies, verify=False) as r:
+    print("current file path:", filename)
+    with requests.get(url, stream=True, proxies=proxies, verify=False, auth = ('sys_degsi1', 'zaq1@wsxcde34rfvbgt5')) as r:
         r.raise_for_status()
         with open(filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
 
 try:
-    download_file(autoattend_url, autoattend_file)
+    # download_file(autoattend_url, autoattend_file)
     download_file(windows_iso_url, windows_iso_file)
 except requests.exceptions.RequestException as e:
     print(f"Download failed: {e}")
 
 
-print("Modifying ISO to include autounattend.xml...")
-if os.path.exists(windows_iso_file):
-    iso = PyCdlib()
-    iso.open(windows_iso_file)
-    iso.add_file(autoattend_file, '/AUTOUNATTEND.XML')
-    iso.write(modified_iso_file)
-    iso.close()
-    print(f"Modified ISO has been created as {modified_iso_file}")
-else:
-    print(f"File not found: {windows_iso_file}. Unable to modify ISO.")
+# print("Modifying ISO to include autounattend.xml...")
+# if os.path.exists(windows_iso_file):
+#     iso = PyCdlib()
+#     iso.open(windows_iso_file)
+#     iso.add_file(autoattend_file, '/AUTOUNATTEND.XML')
+#     iso.write(modified_iso_file)
+#     iso.close()
+#     print(f"Modified ISO has been created as {modified_iso_file}")
+# else:
+#     print(f"File not found: {windows_iso_file}. Unable to modify ISO.")
