@@ -32,7 +32,7 @@ def download_file(url, filename):
 
 try:
     download_file(autoattend_url, autoattend_file)
-    # download_file(windows_iso_url, windows_iso_file)
+    download_file(windows_iso_url, windows_iso_file)
 except requests.exceptions.RequestException as e:
     print(f"Download failed: {e}")
 
