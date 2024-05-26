@@ -2,3 +2,4 @@ requests
 pycdlib
 tqdm
 psutil
+pywin32
