@@ -1,7 +1,7 @@
 import os
 import requests
 from requests.auth import HTTPBasicAuth
-from tqdm import tqdm  # Import tqdm
+from tqdm import tqdm
 
 download_directory = os.path.join(os.getcwd(), "downloads")
 if not os.path.exists(download_directory):
