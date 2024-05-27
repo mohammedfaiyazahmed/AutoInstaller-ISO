@@ -149,6 +149,6 @@ except requests.exceptions.RequestException as e:
     print(f"Download failed: {e}")
 
 
-add_autounattend_to_iso(windows_iso_file, autoattend_file, modified_iso_file)
+# add_autounattend_to_iso(windows_iso_file, autoattend_file, modified_iso_file)
 
 print(f"New ISO created at {modified_iso_file}")
