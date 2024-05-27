@@ -4,10 +4,10 @@ import shutil
 from requests.auth import HTTPBasicAuth
 from tqdm import tqdm
 
-# Print the certs path for debugging purposes
+
 print("*******", requests.certs.where())
 
-# Define paths
+
 download_directory = os.path.join(os.getcwd(), "downloads")
 if not os.path.exists(download_directory):
     os.makedirs(download_directory)
@@ -49,7 +49,7 @@ def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
 
     mount_dir = os.path.join(download_directory, "mount_iso")
 
-    # Mount the ISO file
+
     if not os.path.exists(mount_dir):
         os.makedirs(mount_dir)
 
@@ -57,10 +57,10 @@ def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
     os.system(f'cp -rT {mount_dir} {temp_dir}')
     os.system('sudo umount {mount_dir}')
 
-    # Copy the autounattend.xml to the root of the extracted ISO
+
     shutil.copy(answer_file_path, os.path.join(temp_dir, 'autounattend.xml'))
 
-    # Create a new ISO with the answer file
+
     os.system(f'mkisofs -o {new_iso_path} -J -R -V "Modified Windows ISO" {temp_dir}')
 
     # Clean up
@@ -68,14 +68,14 @@ def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
     shutil.rmtree(mount_dir)
 
 
-# Download files
+
 try:
     download_file(autoattend_url, autoattend_file)
     download_file(windows_iso_url, windows_iso_file)
 except requests.exceptions.RequestException as e:
     print(f"Download failed: {e}")
 
-# Add autounattend.xml to the downloaded ISO
+
 add_autounattend_to_iso(windows_iso_file, autoattend_file, modified_iso_file)
 
 print(f"New ISO created at {modified_iso_file}")

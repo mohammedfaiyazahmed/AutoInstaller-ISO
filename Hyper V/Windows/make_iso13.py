@@ -5,10 +5,10 @@ import subprocess
 from requests.auth import HTTPBasicAuth
 from tqdm import tqdm
 
-# Print the certs path for debugging purposes
+
 print("*******", requests.certs.where())
 
-# Define paths
+
 download_directory = os.path.join(os.getcwd(), "downloads")
 if not os.path.exists(download_directory):
     os.makedirs(download_directory)
@@ -53,39 +53,39 @@ def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
     if not os.path.exists(mount_dir):
         os.makedirs(mount_dir)
 
-    # Mount the ISO file
+
     subprocess.run(['PowerShell', 'Mount-DiskImage', '-ImagePath', iso_path])
 
-    # Get the drive letter of the mounted ISO
+
     drive_letter = subprocess.check_output(
         ['PowerShell', '(Get-DiskImage', f'-ImagePath "{iso_path}").DevicePath']).decode().strip()
     drive_letter = drive_letter.replace('\\', '').replace('.', '') + '\\'
 
-    # Copy the contents of the ISO to a temporary directory
+
     subprocess.run(['xcopy', drive_letter, temp_dir, '/e', '/h', '/k'])
 
-    # Dismount the ISO
+
     subprocess.run(['PowerShell', 'Dismount-DiskImage', '-ImagePath', iso_path])
 
-    # Copy the autounattend.xml to the root of the extracted ISO
+
     shutil.copy(answer_file_path, os.path.join(temp_dir, 'autounattend.xml'))
 
-    # Create a new ISO with the answer file
+
     subprocess.run(['oscdimg', '-m', '-o', '-u2', temp_dir, new_iso_path])
 
-    # Clean up
+
     shutil.rmtree(temp_dir)
     shutil.rmtree(mount_dir)
 
 
-# Download files
+
 try:
     download_file(autoattend_url, autoattend_file)
     download_file(windows_iso_url, windows_iso_file)
 except requests.exceptions.RequestException as e:
     print(f"Download failed: {e}")
 
-# Add autounattend.xml to the downloaded ISO
+
 add_autounattend_to_iso(windows_iso_file, autoattend_file, modified_iso_file)
 
 print(f"New ISO created at {modified_iso_file}")

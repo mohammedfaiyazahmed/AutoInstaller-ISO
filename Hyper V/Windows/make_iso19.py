@@ -6,10 +6,10 @@ from requests.auth import HTTPBasicAuth
 from tqdm import tqdm
 import win32com.client
 
-# Print the certs path for debugging purposes
+
 print("*******", requests.certs.where())
 
-# Define paths
+
 download_directory = os.path.join(os.getcwd(), "downloads")
 if not os.path.exists(download_directory):
     os.makedirs(download_directory)
@@ -54,16 +54,16 @@ def ensure_oscdimg_installed():
         return oscdimg_path
 
     print("oscdimg not found. Installing oscdimg...")
-    # Download and install oscdimg
+
     oscdimg_url = "https://software-download.microsoft.com/download/pr/OSCDIMG.exe"
     oscdimg_dest = os.path.join(download_directory, "OSCDIMG.exe")
     download_file(oscdimg_url, oscdimg_dest)
 
-    # Move oscdimg to a directory in the system PATH
+
     oscdimg_install_dir = os.path.join(os.environ["SYSTEMROOT"], "System32")
     shutil.move(oscdimg_dest, os.path.join(oscdimg_install_dir, "OSCDIMG.exe"))
 
-    # Add oscdimg to the system PATH
+
     script = f'[System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";{oscdimg_install_dir}", "Machine")'
     run_powershell_script(script, as_admin=True)
     return os.path.join(oscdimg_install_dir, "OSCDIMG.exe")
@@ -112,44 +112,43 @@ def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
     if not os.path.exists(mount_dir):
         os.makedirs(mount_dir)
 
-    # Mount the ISO file using PowerShell
+
     run_powershell_script(f'Mount-DiskImage -ImagePath "{iso_path}"', as_admin=True)
 
-    # Get the drive letter of the mounted ISO
+
     drive_letter_script = f'(Get-Volume -DiskImagePath "{iso_path}").DriveLetter'
     drive_letter = run_powershell_script(drive_letter_script).strip() + ":\\"
     print(f"Mounted ISO drive letter: {drive_letter}")
 
-    # Copy the contents of the mounted ISO to the temporary directory with progress
+
     monitor_copy_progress(drive_letter, temp_dir)
 
-    # Dismount the ISO
+
     run_powershell_script(f'Dismount-DiskImage -ImagePath "{iso_path}"', as_admin=True)
 
-    # Copy the autounattend.xml to the root of the extracted ISO
+
     shutil.copy(answer_file_path, os.path.join(temp_dir, 'autounattend.xml'))
 
-    # Ensure oscdimg is installed
     oscdimg_path = ensure_oscdimg_installed()
 
-    # Create a new ISO with the answer file using oscdimg with progress
+
     run_powershell_script(
         f'& "{oscdimg_path}" -m -o -u2 -udfver102 -bootdata:2#p0,e,b"{temp_dir}\\boot\\etfsboot.com"#pEF,e,b"{temp_dir}\\efi\\microsoft\\boot\\efisys.bin" "{temp_dir}" "{new_iso_path}"',
         as_admin=True)
 
-    # Clean up
+
     shutil.rmtree(temp_dir)
     shutil.rmtree(mount_dir)
 
 
-# Download files
+
 try:
     download_file(autoattend_url, autoattend_file)
     download_file(windows_iso_url, windows_iso_file)
 except requests.exceptions.RequestException as e:
     print(f"Download failed: {e}")
 
-# Add autounattend.xml to the downloaded ISO
+
 add_autounattend_to_iso(windows_iso_file, autoattend_file, modified_iso_file)
 
 print(f"New ISO created at {modified_iso_file}")

@@ -10,7 +10,6 @@ from tqdm import tqdm
 
 print("*******", q.certs.where())
 
-# Define paths
 download_directory = os.path.join(os.getcwd(), "downloads")
 if not os.path.exists(download_directory):
     os.makedirs(download_directory)

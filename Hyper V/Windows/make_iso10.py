@@ -5,10 +5,10 @@ from pycdlib import PyCdlib
 from requests.auth import HTTPBasicAuth
 from tqdm import tqdm
 
-# Print the certs path for debugging purposes
+
 print("*******", requests.certs.where())
 
-# Define paths
+
 download_directory = os.path.join(os.getcwd(), "downloads")
 if not os.path.exists(download_directory):
     os.makedirs(download_directory)
@@ -41,11 +41,11 @@ def download_file(url, filename):
 
 
 def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
-    # Create a temporary directory for ISO extraction
+
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
-    # Attempt to open the ISO to verify its validity
+
     iso = PyCdlib()
     try:
         iso.open(iso_path)
@@ -53,7 +53,6 @@ def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
         print(f"Failed to open ISO: {e}")
         return
 
-    # Extract the ISO contents to the temporary directory
     try:
         iso.extract_all(temp_dir)
     except Exception as e:
@@ -61,14 +60,13 @@ def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
         iso.close()
         return
 
-    # Copy the autounattend.xml to the root of the extracted ISO
+
     shutil.copy(answer_file_path, os.path.join(temp_dir, 'autounattend.xml'))
 
-    # Create a new ISO with the answer file
+
     new_iso = PyCdlib()
     new_iso.new(iso_level=3)
 
-    # Walk through the temp directory and add all files to the new ISO
     files_to_add = []
     for root, dirs, files in os.walk(temp_dir):
         for file in files:
@@ -82,23 +80,23 @@ def add_autounattend_to_iso(iso_path, answer_file_path, new_iso_path):
         progress_bar.update(1)
     progress_bar.close()
 
-    # Write out the new ISO
+
     new_iso.write(new_iso_path)
 
-    # Clean up
+
     iso.close()
     new_iso.close()
     shutil.rmtree(temp_dir)
 
 
-# Download files
+
 try:
     download_file(autoattend_url, autoattend_file)
     download_file(windows_iso_url, windows_iso_file)
 except requests.exceptions.RequestException as e:
     print(f"Download failed: {e}")
 
-# Add autounattend.xml to the downloaded ISO
+
 add_autounattend_to_iso(windows_iso_file, autoattend_file, modified_iso_file)
 
 print(f"New ISO created at {modified_iso_file}")

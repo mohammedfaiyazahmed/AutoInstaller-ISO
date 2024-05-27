@@ -36,13 +36,3 @@ except requests.exceptions.RequestException as e:
     print(f"Download failed: {e}")
 
 
-# print("Modifying ISO to include autounattend.xml...")
-# if os.path.exists(windows_iso_file):
-#     iso = PyCdlib()
-#     iso.open(windows_iso_file)
-#     iso.add_file(autoattend_file, '/AUTOUNATTEND.XML')
-#     iso.write(modified_iso_file)
-#     iso.close()
-#     print(f"Modified ISO has been created as {modified_iso_file}")
-# else:
-#     print(f"File not found: {windows_iso_file}. Unable to modify ISO.")
